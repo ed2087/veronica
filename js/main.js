@@ -1,252 +1,243 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // ========== Loading Overlay scroll-hint==========
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== Loading Overlay ==========
     const loadingOverlay = document.querySelector('.loading-overlay');
-    if (loadingOverlay) {
-        window.addEventListener('load', function () {
-            setTimeout(function () {
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.visibility = 'hidden';
-            }, 500);
-        });
-    }
+    
+    // Simulate loading
+    setTimeout(function() {
+        loadingOverlay.style.opacity = '0';
+        loadingOverlay.style.pointerEvents = 'none';
+    }, 1500);
 
-    // ========== Navigation scroll-hint==========
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navOverlay = document.querySelector('.nav-overlay');
+    // ========== Theme Toggle ==========
+    const themeToggle = document.querySelector('.theme-toggle');
+    const html = document.documentElement;
+    
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        
+        // Update icon
+        const icon = this.querySelector('i');
+        icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        
+        // Save preference
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    const icon = themeToggle.querySelector('i');
+    icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+    // ========== Navigation ==========
     const navLinks = document.querySelectorAll('.nav-link');
-    const menuIcon = document.querySelector('.menu-icon');
-
-    if (menuToggle && navOverlay && menuIcon) {
-        menuToggle.addEventListener('click', function () {
-            const isActive = this.classList.toggle('active');
-            navOverlay.classList.toggle('active');
-
-            if (isActive) {
-                menuIcon.style.transform = 'rotate(45deg)';
-                menuIcon.style.setProperty('--before-transform', 'rotate(-45deg) translate(-5px, 6px)');
-                menuIcon.style.setProperty('--after-opacity', '0');
-            } else {
-                menuIcon.style.transform = 'rotate(0)';
-                menuIcon.style.setProperty('--before-transform', 'rotate(0) translate(0, 0)');
-                menuIcon.style.setProperty('--after-opacity', '1');
-            }
-        });
-    }
-
+    const sections = document.querySelectorAll('.section');
+    
     navLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetSection = this.getAttribute('data-section');
-
-            if (menuToggle && navOverlay && menuIcon) {
-                menuToggle.classList.remove('active');
-                navOverlay.classList.remove('active');
-                menuIcon.style.transform = 'rotate(0)';
-                menuIcon.style.setProperty('--before-transform', 'rotate(0) translate(0, 0)');
-                menuIcon.style.setProperty('--after-opacity', '1');
-            }
-
-            switchSection(targetSection);
+            
+            // Remove active class from all links
+            navLinks.forEach(navLink => {
+                navLink.classList.remove('active');
+            });
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Get target section
+            const targetId = this.getAttribute('data-section');
+            const targetSection = document.getElementById(targetId);
+            
+            // Hide all sections
+            sections.forEach(section => {
+                section.classList.remove('active-section');
+            });
+            
+            // Show target section
+            targetSection.classList.add('active-section');
+            
+            // Scroll to top of section
+            window.scrollTo(0, 0);
         });
     });
 
-    // ========== Section Management ==========
-    function switchSection(sectionId) {
-        const currentSection = document.querySelector('.active-section');
-        const newSection = document.getElementById(sectionId);
-
-        if (currentSection && newSection && currentSection !== newSection) {
-            currentSection.classList.remove('active-section');
-            newSection.classList.add('active-section');
-        }
-    }
-
-    // ========== Close Section Buttons ==========
-    const closeButtons = document.querySelectorAll('.close-section');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const currentSection = this.closest('.fullscreen-section');
-            const heroSection = document.getElementById('hero');
-
-            if (currentSection && heroSection) {
-                currentSection.classList.remove('active-section');
-                heroSection.classList.add('active-section');
-            }
+    // ========== Gallery ==========
+    const galleryGrid = document.querySelector('.gallery-grid');
+    const imageViewer = document.querySelector('.image-viewer');
+    const viewerImage = document.querySelector('.viewer-image');
+    const viewerCaption = document.querySelector('.viewer-caption');
+    const closeViewer = document.querySelector('.close-viewer');
+    const viewerPrev = document.querySelector('.viewer-prev');
+    const viewerNext = document.querySelector('.viewer-next');
+    
+    // Sample gallery data (replace with your actual images)
+    const galleryData = [
+        { src: 'images/gallery/gallery1.jpg', caption: 'Gallery Image 1' },
+        { src: 'images/gallery/gallery2.jpg', caption: 'Gallery Image 2' },
+        { src: 'images/gallery/gallery3.jpg', caption: 'Gallery Image 3' },
+        { src: 'images/gallery/gallery4.jpg', caption: 'Gallery Image 4' },
+        { src: 'images/gallery/gallery5.jpg', caption: 'Gallery Image 5' },
+        { src: 'images/gallery/gallery6.jpg', caption: 'Gallery Image 6' },
+        { src: 'images/gallery/gallery7.jpg', caption: 'Gallery Image 7' },
+        { src: 'images/gallery/gallery8.jpg', caption: 'Gallery Image 8' },
+        { src: 'images/gallery/gallery9.jpg', caption: 'Gallery Image 9' },
+        { src: 'images/gallery/gallery10.jpg', caption: 'Gallery Image 10' },
+        { src: 'images/gallery/gallery11.jpg', caption: 'Gallery Image 11' },
+        { src: 'images/gallery/gallery12.jpg', caption: 'Gallery Image 12' },
+        { src: 'images/gallery/gallery13.jpg', caption: 'Gallery Image 13' },
+        { src: 'images/gallery/gallery14.jpg', caption: 'Gallery Image 14' },
+        { src: 'images/gallery/gallery15.jpg', caption: 'Gallery Image 15' },
+        { src: 'images/gallery/gallery16.jpg', caption: 'Gallery Image 16' },
+        { src: 'images/gallery/gallery17.jpg', caption: 'Gallery Image 17' }
+      ];
+      
+    
+    // Populate gallery
+    galleryData.forEach((item, index) => {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item';
+        galleryItem.setAttribute('data-index', index);
+        
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.caption;
+        
+        const caption = document.createElement('div');
+        caption.className = 'gallery-caption';
+        caption.textContent = item.caption;
+        
+        galleryItem.appendChild(img);
+        galleryItem.appendChild(caption);
+        galleryGrid.appendChild(galleryItem);
+        
+        // Add click event to open viewer
+        galleryItem.addEventListener('click', function() {
+            openViewer(index);
         });
     });
-
-    // ========== Hero Slider ==========
-    const heroImages = document.querySelectorAll('.hero-image');
-    if (heroImages.length > 0) {
-        let currentHeroImage = 0;
-        heroImages[currentHeroImage].classList.add('active');
-
-        if (heroImages.length > 1) {
-            setInterval(function () {
-                heroImages[currentHeroImage].classList.remove('active');
-                currentHeroImage = (currentHeroImage + 1) % heroImages.length;
-                heroImages[currentHeroImage].classList.add('active');
-            }, 5000);
+    
+    // Open image viewer
+    function openViewer(index) {
+        const item = galleryData[index];
+        viewerImage.src = item.src;
+        viewerImage.alt = item.caption;
+        viewerCaption.textContent = item.caption;
+        imageViewer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Update current index
+        currentIndex = index;
+    }
+    
+    // Close image viewer
+    function closeViewerFunc() {
+        imageViewer.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Navigation in viewer
+    let currentIndex = 0;
+    
+    function showPrevImage() {
+        currentIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
+        const item = galleryData[currentIndex];
+        viewerImage.src = item.src;
+        viewerCaption.textContent = item.caption;
+    }
+    
+    function showNextImage() {
+        currentIndex = (currentIndex + 1) % galleryData.length;
+        const item = galleryData[currentIndex];
+        viewerImage.src = item.src;
+        viewerCaption.textContent = item.caption;
+    }
+    
+    // Event listeners
+    closeViewer.addEventListener('click', closeViewerFunc);
+    viewerPrev.addEventListener('click', showPrevImage);
+    viewerNext.addEventListener('click', showNextImage);
+    
+    // Close viewer when clicking on overlay
+    imageViewer.addEventListener('click', function(e) {
+        if (e.target === imageViewer) {
+            closeViewerFunc();
         }
-    }
-
-
-    // ========== Gallery Slider (Fade Transition) ==========
-    const galleryTrack = document.querySelector('.gallery-track');
-    const galleryPrev = document.querySelector('.gallery-prev');
-    const galleryNext = document.querySelector('.gallery-next');
-
-    const TOTAL_IMAGES = 16;
-    let currentGallerySlide = 0;
-    let gallerySlides = [];
-
-    function createGallerySlides() {
-        for (let i = 1; i <= TOTAL_IMAGES; i++) {
-            const slide = document.createElement('div');
-            slide.className = 'gallery-slide';
-
-            const img = document.createElement('img');
-            img.src = `images/gallery/gallery${i}.jpg`;
-            img.alt = `Gallery Image ${i}`;
-            img.loading = 'lazy';
-
-            slide.appendChild(img);
-            galleryTrack.appendChild(slide);
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (imageViewer.classList.contains('active')) {
+            if (e.key === 'Escape') {
+                closeViewerFunc();
+            } else if (e.key === 'ArrowLeft') {
+                showPrevImage();
+            } else if (e.key === 'ArrowRight') {
+                showNextImage();
+            }
         }
-
-        gallerySlides = document.querySelectorAll('.gallery-slide');
-        updateGalleryFade(); // show first one
-    }
-
-    function updateGalleryFade() {
-        gallerySlides.forEach((slide, index) => {
-            slide.style.opacity = index === currentGallerySlide ? '1' : '0';
-            slide.style.zIndex = index === currentGallerySlide ? '2' : '1';
-            slide.classList.toggle('active', index === currentGallerySlide);
-        });
-    }
-
-    // Navigation Events
-    if (galleryPrev) {
-        galleryPrev.addEventListener('click', () => {
-            currentGallerySlide = (currentGallerySlide - 1 + gallerySlides.length) % gallerySlides.length;
-            updateGalleryFade();
-        });
-    }
-    if (galleryNext) {
-        galleryNext.addEventListener('click', () => {
-            currentGallerySlide = (currentGallerySlide + 1) % gallerySlides.length;
-            updateGalleryFade();
-        });
-    }
-
-    // Touch Swipe Events
-    if (galleryTrack) {
-        let startX = 0;
-        let endX = 0;
-
-        galleryTrack.addEventListener('touchstart', e => {
-            startX = e.changedTouches[0].screenX;
-        }, false);
-
-        galleryTrack.addEventListener('touchend', e => {
-            endX = e.changedTouches[0].screenX;
-            if (endX < startX - 50) {
-                currentGallerySlide = (currentGallerySlide + 1) % gallerySlides.length;
-            } else if (endX > startX + 50) {
-                currentGallerySlide = (currentGallerySlide - 1 + gallerySlides.length) % gallerySlides.length;
-            }
-            updateGalleryFade();
-        }, false);
-    }
-
-    // Init
-    createGallerySlides();
-
-
-    // ========== Scroll Hint ==========
-    const scrollHint = document.querySelector('.scroll-hint');
-    const aboutSection = document.getElementById('about');
-    const heroSection = document.getElementById('hero');
-
-    function setupScrollTransition() {
-        const heroSection = document.getElementById('hero');
-        const aboutSection = document.getElementById('about');
-        let hasScrolled = false;
-    
-        if (!heroSection || !aboutSection) return;
-    
-        window.addEventListener('wheel', function (e) {
-            if (!hasScrolled && e.deltaY > 0) {
-                aboutSection.classList.add('active-section');
-                heroSection.classList.remove('active-section');
-                hasScrolled = true;
-            }
-        }, { passive: true });
-    
-        // Reset on scroll up (optional)
-        window.addEventListener('wheel', function (e) {
-            if (hasScrolled && e.deltaY < 0) {
-                heroSection.classList.add('active-section');
-                aboutSection.classList.remove('active-section');
-                hasScrolled = false;
-            }
-        }, { passive: true });
-    }
-    
-    function setupTouchScrollTransition() {
-        const heroSection = document.getElementById('hero');
-        const aboutSection = document.getElementById('about');
-        let startY = 0;
-    
-        window.addEventListener('touchstart', e => {
-            startY = e.touches[0].clientY;
-        }, { passive: true });
-    
-        window.addEventListener('touchend', e => {
-            const endY = e.changedTouches[0].clientY;
-            if (startY - endY > 50) {
-                // Swipe up
-                aboutSection.classList.add('active-section');
-                heroSection.classList.remove('active-section');
-            } else if (endY - startY > 50) {
-                // Swipe down
-                heroSection.classList.add('active-section');
-                aboutSection.classList.remove('active-section');
-            }
-        }, { passive: true });
-
-
-        //on click or touch 
-        scrollHint.addEventListener('click', function () {
-            aboutSection.classList.add('active-section');
-            heroSection.classList.remove('active-section');
-        });
-        scrollHint.addEventListener('touchstart', function () {
-            aboutSection.classList.add('active-section');
-            heroSection.classList.remove('active-section');
-        });
-
-    }
-    
-    setupScrollTransition();
-    setupTouchScrollTransition();
+    });
 
     // ========== Contact Form ==========
     const contactForm = document.querySelector('.contact-form');
+    
     if (contactForm) {
-        contactForm.addEventListener('submit', function (e) {
+        contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you for your message. Veronica will get back to you soon.');
+            
+            // Get form values
+            const name = this.querySelector('#name').value;
+            const email = this.querySelector('#email').value;
+            const message = this.querySelector('#message').value;
+            
+            // Here you would typically send the data to a server
+            console.log('Form submitted:', { name, email, message });
+            
+            // Show success message
+            alert('Thank you for your message! Veronica will get back to you soon.');
+            
+            // Reset form
             this.reset();
+        });
+    }
 
-            const heroSection = document.getElementById('hero');
-            const currentSection = this.closest('.fullscreen-section');
-
-            if (heroSection && currentSection) {
-                heroSection.classList.add('active-section');
-                currentSection.classList.remove('active-section');
+    // ========== Scroll Animations ==========
+    const animateOnScroll = function() {
+        const elements = document.querySelectorAll('.gallery-item, .skill-level');
+        
+        elements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            if (elementPosition < windowHeight - 100) {
+                element.classList.add('animate');
             }
+        });
+    };
+    
+    // Initial check
+    animateOnScroll();
+    
+    // Check on scroll
+    window.addEventListener('scroll', animateOnScroll);
+
+    // ========== Hero Button Navigation ==========
+    const heroPortfolioBtn = document.querySelector('.hero-cta .btn-primary');
+    const heroContactBtn = document.querySelector('.hero-cta .btn-outline');
+    
+    if (heroPortfolioBtn) {
+        heroPortfolioBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('[data-section="gallery"]').click();
+        });
+    }
+    
+    if (heroContactBtn) {
+        heroContactBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('[data-section="contact"]').click();
         });
     }
 });
